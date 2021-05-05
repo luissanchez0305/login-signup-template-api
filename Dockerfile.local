@@ -1,0 +1,23 @@
+FROM node:lts-alpine
+
+ENV NODE_ENV=development
+
+RUN apk --no-cache add \
+  python \
+  make \
+  g++
+
+WORKDIR /usr/src/app
+
+COPY package*.json ./
+
+RUN npm i
+
+COPY . .
+
+RUN npm run build
+
+EXPOSE 3011
+EXPOSE 9230
+
+CMD [ "node", "dist/main" ]

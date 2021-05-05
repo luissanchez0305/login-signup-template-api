@@ -1,0 +1,50 @@
+version: '3.7'
+
+services:
+  esfera-admin-api:
+    container_name: esfera-admin-api
+    build:
+      context: .
+      dockerfile: Dockerfile.local
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    ports:
+      - ${PORT}:${PORT}
+      - 9229:9229
+    command: npm run start:debug
+    env_file:
+      - .env
+    networks:
+      - adminwebnet
+    depends_on:
+      - redis
+      - mongodb
+  redis:
+    env_file:
+      - .env
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    container_name: esfera-admin-api-redis
+    image: bitnami/redis:6.2
+    ports:
+      - 6378:6378
+    networks:
+      - adminwebnet
+  mongodb:
+    env_file:
+      - .env
+    environment:
+      - MONGODB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+    container_name: esfera-admin-api-mongodb
+    image: bitnami/mongodb:4.4
+    ports:
+      - 27016:27016
+    volumes:
+      - adminmongodbdata:/bitnami/mongodb
+    networks:
+      - adminwebnet
+networks:
+  adminwebnet:
+volumes:
+  adminmongodbdata:
